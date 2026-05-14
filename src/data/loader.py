@@ -117,13 +117,18 @@ def build_dataset(
         if i % 500 == 0:
             print(f"  Processing {i}/{min(max_samples, len(raw['train']))}...")
 
-        result = spans_to_iob(
-            example["text"],
-            example["entities"],
-            tokenizer,
-            LABEL_LIST,
-        )
-        processed.append(result)
+        try:
+            result = spans_to_iob(
+                example["text"],
+                example["entities"],
+                tokenizer,
+                LABEL_LIST,
+            )
+            if "labels" not in result:
+                continue
+            processed.append(result)
+        except Exception as e:
+            continue
 
         for entity in example["entities"]:
             entity_counts[entity["class"]] += 1
